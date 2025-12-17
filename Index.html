@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    <style>
+        :root { --vino: #9D2449; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--vino); font-family: sans-serif; }
+        .pantalla { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; box-sizing: border-box; }
+        .activa { display: flex; }
+        .btn { background: transparent; border: 1px solid white; color: white; padding: 15px; width: 85%; margin: 10px; border-radius: 4px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+        #p-licencia { background: white; color: black; justify-content: flex-start; padding: 15px; overflow-y: auto; text-align: left; }
+        .label { font-weight: bold; font-size: 8px; color: #000; margin-top: 5px; }
+        .dato { font-size: 10px; color: #333; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #eee; display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div id="p-home" class="pantalla activa">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Coat_of_arms_of_Mexico.svg/500px-Coat_of_arms_of_Mexico.svg.png" style="width:100px; margin-bottom: 20px;">
+        <div style="font-size: 18px; letter-spacing: 2px; text-align: center;">LICENCIA FEDERAL DIGITAL</div>
+        <button class="btn" onclick="navegar('p-login')" style="margin-top: 50px;">DESCARGAR MI LICENCIA</button>
+    </div>
+
+    <div id="p-login" class="pantalla" style="background:white; color:black;">
+        <h3 style="color:var(--vino);">Validar Datos</h3>
+        <input id="c" placeholder="CURP">
+        <input id="t" placeholder="TELÉFONO" type="number">
+        <input id="p" type="password" placeholder="CONTRASEÑA">
+        <button class="btn" style="background:var(--vino); border:none; width:100%;" onclick="login()">VALIDAR</button>
+        <p onclick="navegar('p-home')" style="color:#666; margin-top:15px; font-size:12px; cursor:pointer;">Regresar</p>
+    </div>
+
+    <div id="p-licencia" class="pantalla">
+        <div style="border-bottom: 2px solid var(--vino); width:100%; margin-bottom: 10px; padding-bottom:5px;">
+            <b style="color:var(--vino); font-size: 14px;">COMUNICACIONES</b>
+        </div>
+        <div style="display: flex; width: 100%; gap: 10px;">
+            <div style="width: 50%;">
+                <img id="f-foto" src="" style="width:100%; border:1px solid #000; height:120px; object-fit:cover;">
+                <span class="label">NOMBRE:</span><span id="f-nom" class="dato"></span>
+                <span class="label">LICENCIA:</span><span id="f-lic" class="dato"></span>
+                <span class="label">CURP:</span><span id="f-curp" class="dato"></span>
+            </div>
+            <div style="width: 50%; text-align: right;">
+                <img id="f-qr" src="" style="width:100px; height:100px;">
+                <span class="label">VIGENCIA:</span><span id="f-vig" class="dato"></span>
+                <span class="label">CATEGORÍA:</span><span id="f-cat" class="dato"></span>
+                <span class="label">EXP. MÉDICO:</span><span id="f-med" class="dato"></span>
+            </div>
+        </div>
+        <button class="btn" style="color:var(--vino); border-color:var(--vino); margin-top: 20px; width:100%;" onclick="navegar('p-home')">CERRAR SESIÓN</button>
+    </div>
+
+    <script>
+        const db = {
+            "SAGE960620HPLLND10": { n: "EDOARDO SALVADOR GONZALEZ", l: "PUE0034931", m: "962256", v: "25-03-2021 AL 24-03-2025", c: "B", t: "3333333333", p: sha256("edoardo1"), f: "https://via.placeholder.com/150?text=EDOARDO" },
+            "LOVJ920213HVZPZN00": { n: "JUAN ALBERTO LOPEZ VAZQUEZ", l: "VER000001", m: "100000", v: "15-12-2025 AL 15-12-2027", c: "A", t: "2724141648", p: sha256("usuario1"), f: "https://via.placeholder.com/150?text=JUAN" }
+        };
+        function navegar(id){ document.querySelectorAll('.pantalla').forEach(p=>p.classList.remove('activa')); document.getElementById(id).classList.add('activa'); }
+        function login(){
+            const curp = document.getElementById('c').value.toUpperCase().trim();
+            const tel = document.getElementById('t').value.trim();
+            const pass = sha256(document.getElementById('p').value.trim());
+            const u = db[curp];
+            if(u && u.t === tel && u.p === pass){
+                document.getElementById('f-nom').innerText = u.n; document.getElementById('f-lic').innerText = u.l;
+                document.getElementById('f-curp').innerText = curp; document.getElementById('f-med').innerText = u.m;
+                document.getElementById('f-vig').innerText = u.v; document.getElementById('f-cat').innerText = u.c;
+                document.getElementById('f-foto').src = u.f;
+                document.getElementById('f-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${curp}`;
+                navegar('p-licencia');
+            } else { alert("Datos incorrectos"); }
+        }
+    </script>
+</body>
+      </html>
+
