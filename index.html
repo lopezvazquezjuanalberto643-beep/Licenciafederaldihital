@@ -30,7 +30,112 @@
         <input id="p" type="password" placeholder="CONTRASEÑA">
         <button class="btn" style="background:var(--vino); border:none; width:100%;" onclick="login()">VALIDAR</button>
         <p onclick="navegar('p-home')" style="color:#666; margin-top:15px; font-size:12px; cursor:pointer;">Regresar</p>
+    </div><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licencia Federal Digital</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="database.js"></script>
+    
+    <style>
+        /* Aquí va todo el diseño color vino, marcos grises y tipografía oficial */
+        :root { --guinda: #611232; --oro: #A57F2C; }
+        body { font-family: 'Montserrat', sans-serif; background: #f4f4f4; margin: 0; }
+        .pantalla { display: none; padding: 20px; }
+        .activa { display: block; }
+        .licencia-card { background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .header-gob { background: var(--guinda); color: white; padding: 10px; text-align: center; border-radius: 10px 10px 0 0; }
+        .foto-perfil { width: 120px; height: 150px; border: 2px solid #ccc; object-fit: cover; }
+        #qrcode { display: flex; justify-content: center; padding: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="pantalla-login" class="pantalla activa">
+        <div class="header-gob">VALIDACIÓN DE DATOS</div>
+        <input type="text" id="curp" placeholder="Ingrese CURP">
+        <input type="text" id="medico" placeholder="Expediente Médico">
+        <button onclick="validar()">VALIDAR</button>
     </div>
+
+    <div id="pantalla-licencia" class="pantalla">
+        <div class="licencia-card">
+            <div class="header-gob">ESTADOS UNIDOS MEXICANOS</div>
+            <div style="display: flex; padding: 15px;">
+                <img id="user-foto" class="foto-perfil" src="">
+                <div style="margin-left: 15px;">
+                    <h3 id="user-nombre"></h3>
+                    <p>Licencia: <b id="user-num" style="color:red;"></b></p>
+                    <p>Vigencia: <span id="user-vigencia"></span></p>
+                </div>
+            </div>
+            <div id="qrcode"></div> <button onclick="location.reload()">VERIFICAR OTRA LICENCIA</button>
+        </div>
+    </div>
+
+    <script>
+        function validar() {
+            const c = document.getElementById('curp').value.toUpperCase();
+            const m = document.getElementById('medico').value;
+            
+            // La máquina busca en la base de datos independiente
+            const user = buscarUsuario(c, m);
+
+            if(user) {
+                document.getElementById('pantalla-login').classList.remove('activa');
+                document.getElementById('pantalla-licencia').classList.add('activa');
+                
+                // Llenar datos automáticamente
+                document.getElementById('user-nombre').innerText = user.nombre;
+                document.getElementById('user-num').innerText = user.licencia;
+                document.getElementById('user-vigencia').innerText = user.vigencia;
+                document.getElementById('user-foto').src = user.foto;
+                
+                // Generar QR dinámico completo con la URL oficial
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: "https://app.sct.gob.mx/ConsultaInfracciones/detalleLicFederal.do?curp=" + user.curp,
+                    width: 150, height: 150
+                });
+            } else {
+                alert("Datos no encontrados en el Sistema Federal.");
+            }
+        }
+    </script>
+</body>
+</html>// ESTA ES TU BASE DE DATOS INDEPENDIENTE
+const base_datos = [
+  {
+    "id": "001",
+    "nombre": "JUAN ALBERTO LOPEZ VAZQUEZ",
+    "curp": "LOVZ920213HVZPZN00",
+    "licencia": "VER0410546",
+    "medico": "959711",
+    "vigencia": "05-04-2024 - 05-04-2026",
+    "antiguedad": "14-09-2016",
+    "categoria": "B, E",
+    "foto": "https://raw.githubusercontent.com/lopezvazquezjuanalberto643-beep/Licencia-federal/main/foto1.jpg"
+  },
+  {
+    "id": "002",
+    "nombre": "GABRIEL MARTINEZ FREIRE",
+    "curp": "MAFG850101HDFRRN01",
+    "licencia": "DF00000000",
+    "medico": "123456",
+    "vigencia": "01-01-2024 - 01-01-2026",
+    "antiguedad": "20-05-2010",
+    "categoria": "B",
+    "foto": "https://raw.githubusercontent.com/lopezvazquezjuanalberto643-beep/Licencia-federal/main/foto2.jpg"
+  }
+];
+
+// Función para buscar usuarios (no tocar)
+function buscarUsuario(curpInput, medicoInput) {
+    return base_datos.find(u => u.curp === curpInput && u.medico === medicoInput);
+}
+    
 
     <div id="p-licencia" class="pantalla">
         <div style="border-bottom: 2px solid var(--vino); width:100%; margin-bottom: 10px; padding-bottom:5px;">
